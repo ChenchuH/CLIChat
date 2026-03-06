@@ -7,12 +7,12 @@ import os
 
 console = Console()
 
-WS_URL="ws://clichat-test.onrender.com"
-LOCAL_URL = "localhost"
+WS_URL="wss://clichat-test.onrender.com"
+LOCAL_URL = "wss://localhost:8765"
 #switch url source based on where you are testing, WS_URL is the render.io dash
 
 async def main():
-    url = WS_URL
+    url = WS_URL #or LOCAL_URL
 
     async with websockets.connect(url) as ws:
         async def receiver():
