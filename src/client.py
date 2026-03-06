@@ -3,15 +3,20 @@ import sys
 import websockets
 from rich.console import Console
 from rich.text import Text
+import os
 
 console = Console()
 
+WS_URL="ws://clichat-test.onrender.com"
+LOCAL_URL = "localhost"
+#switch url source based on where you are testing, WS_URL is the render.io dash
+
 async def main():
-    url = sys.argv[1] if len(sys.argv) > 1 else "ws://localhost:8765"
+    url = WS_URL
 
     async with websockets.connect(url) as ws:
         async def receiver():
-            async for msg in ws:
+            async for msg in ws:    
                 # Expected format: "Client 1: hello"
                 if msg.startswith("Client "):
                     prefix, rest = msg.split(":", 1)
