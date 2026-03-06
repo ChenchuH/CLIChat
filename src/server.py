@@ -1,5 +1,6 @@
 import asyncio
 import websockets
+import os 
 
 CL_ID = 1
 CLIENTS_IDs = {}
@@ -31,7 +32,10 @@ async def handler(ws):
         CLIENTS_IDs.pop(ws, None)
 
 async def main():
-    async with websockets.serve(handler, "localhost", 8765):
+    port = int(os.environ.get("PORT", "10000")) # ties port the the enviorment variable thats the port, 10000 is a fallback ID if no port is given.
+    host = "0.0.0.0"
+
+    async with websockets.serve(handler, host, port):
         await asyncio.Future()
 
 if __name__ == "__main__":
