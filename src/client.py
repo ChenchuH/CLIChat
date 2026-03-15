@@ -8,11 +8,11 @@ import os
 console = Console()
 
 WS_URL="wss://clichat-test.onrender.com"
-LOCAL_URL = "wss://localhost:8765"
+LOCAL_URL = "ws://localhost:8765"
 #switch url source based on where you are testing, WS_URL is the render.io dash
 
 async def main():
-    url = WS_URL #or LOCAL_URL
+    url = LOCAL_URL #or LOCAL_URL
 
     async with websockets.connect(url) as ws:
         async def receiver():
@@ -32,6 +32,8 @@ async def main():
         async def sender():
             loop = asyncio.get_running_loop()
             while True:
+                # prompt = f"Client x: "
+                # line = await loop.run_in_executor(None, input, prompt)
                 line = await loop.run_in_executor(None, sys.stdin.readline)
                 if not line:
                     break
