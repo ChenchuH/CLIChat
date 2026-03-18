@@ -10,6 +10,7 @@ async def handler(ws):
     global CL_ID
 
     CLIENTS_IDs[ws] = CL_ID
+    await ws.send(f"Connecting as Client {CL_ID}")
     CL_ID += 1
     CLIENTS.add(ws)
 
