@@ -144,7 +144,7 @@ async def main():
                     print_formatted_text(HTML(f'<gray>Connected as Client {my_id}</gray>'))
                 elif msg.startswith("Client "):
                     prefix, rest = msg.split(":", 1)
-                    print_formatted_text(HTML(f'<cyan>{prefix}</cyan>:{rest}'))
+                    print_formatted_text(HTML(f'<orange>{prefix}</orange>:{rest}'))
                 else:
                     print_formatted_text(HTML(msg))
  
@@ -152,13 +152,13 @@ async def main():
             with patch_stdout():
                 while True:
                     try:
-                        prompt_str = HTML(f'<green>Client {my_id or "?"} &gt;</green> ')
+                        prompt_str = HTML(f'<cyan>Client {my_id or "?"} &gt;</cyan> ')
                         line = await session.prompt_async(prompt_str)
                     except (EOFError, KeyboardInterrupt):
                         break
                     if line.strip():
                         await ws.send(line)
-                        print_formatted_text(HTML(f'<green>Client {my_id}</green>: {line}'))
+                        print_formatted_text(HTML(f'<cyan>Client {my_id}</cyan>: {line}'))
  
         await asyncio.gather(receiver(), sender())
  
