@@ -144,7 +144,7 @@ async def main():
                     print_formatted_text(HTML(f'<gray>Connected as Client {my_id}</gray>'))
                 elif msg.startswith("Client "):
                     prefix, rest = msg.split(":", 1)
-                    print_formatted_text(HTML(f'<orange>{prefix}</orange>:{rest}'))
+                    print_formatted_text(HTML(f'<red>{prefix}</red>:{rest}'))
                 else:
                     print_formatted_text(HTML(msg))
  
