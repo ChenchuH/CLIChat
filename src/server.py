@@ -6,7 +6,7 @@ from datetime import datetime
 
 CL_ID = 1
 CLIENTS_IDs = {}
-CLIENTS = set()
+CLIENTS = set()  # passes the ws argument, its a list of clients stored as ws arugments for each
 
 DB_FILE = "chat.db"
 
@@ -25,13 +25,14 @@ async def init_db():
 
 
 async def save_message(client_id, message):
-    timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     async with aiosqlite.connect(DB_FILE) as db:
         await db.execute(
             "INSERT INTO messages (client_id, message, timestamp) VALUES (?, ?, ?)",
             (client_id, message, timestamp)
         )
         await db.commit()
+    return timestamp
 
 
 async def send_history(ws, limit=20):
@@ -43,13 +44,14 @@ async def send_history(ws, limit=20):
             LIMIT ?
         """, (limit,))
         rows = await cursor.fetchall()
+        await cursor.close()
 
     rows.reverse()
 
     if rows:
         await ws.send("---- Recent Messages ----")
         for client_id, message, timestamp in rows:
-            await ws.send(f"[{timestamp}] Client {client_id}: {message}")
+            await ws.send(f"Client {client_id}: {message}")
         await ws.send("-------------------------")
 
 
@@ -64,23 +66,26 @@ async def handler(ws):
 
     try:
         async for msg in ws:
+            msg = msg.strip()
+            if not msg:
+                continue
+
             sender_ID = CLIENTS_IDs[ws]
             await save_message(sender_ID, msg)
 
             dead = []
+            others = [x for x in CLIENTS if x is not ws]
             tasks = []
 
-            for x in CLIENTS:
-                if x is ws:
-                    continue
+            for x in others:
                 tasks.append(x.send(f"Client {sender_ID}: {msg}"))
 
-            results = await asyncio.gather(*tasks, return_exceptions=True)
+            if tasks:
+                results = await asyncio.gather(*tasks, return_exceptions=True)
 
-            other_clients = [x for x in CLIENTS if x is not ws]
-            for client, result in zip(other_clients, results):
-                if isinstance(result, Exception):
-                    dead.append(client)
+                for client, result in zip(others, results):
+                    if isinstance(result, Exception):
+                        dead.append(client)
 
             for d in dead:
                 CLIENTS.discard(d)
@@ -94,11 +99,10 @@ async def handler(ws):
 async def main():
     await init_db()
 
-    port = int(os.environ.get("PORT", "10000"))
+    port = int(os.environ.get("PORT", "10000"))  # ties port the the enviorment variable thats the port, 10000 is a fallback ID if no port is given.
     host = "0.0.0.0"
 
     async with websockets.serve(handler, host, port):
-        print(f"Server running on ws://{host}:{port}")
         await asyncio.Future()
 
 if __name__ == "__main__":

@@ -9,26 +9,23 @@ console = Console()
 
 WS_URL = "wss://clichat-test.onrender.com"
 LOCAL_URL = "ws://localhost:10000"
-
+# switch url source based on where you are testing, WS_URL is the render.io dash
 
 async def main():
-    url = LOCAL_URL  # switch to WS_URL when using Render
+    url = LOCAL_URL  # or WS_URL
 
     async with websockets.connect(url) as ws:
-
         async def receiver():
             async for msg in ws:
-                if msg.startswith("Client ") or msg.startswith("["):
-                    if ":" in msg:
-                        prefix, rest = msg.split(":", 1)
+                # Expected format: "Client 1: hello"
+                if msg.startswith("Client "):
+                    prefix, rest = msg.split(":", 1)
 
-                        text = Text()
-                        text.append(prefix, style="bold cyan")
-                        text.append(":" + rest)
+                    text = Text()
+                    text.append(prefix, style="bold cyan")
+                    text.append(":" + rest)
 
-                        console.print(text)
-                    else:
-                        console.print(msg)
+                    console.print(text)
                 else:
                     console.print(msg)
 
@@ -38,10 +35,14 @@ async def main():
                 line = await loop.run_in_executor(None, sys.stdin.readline)
                 if not line:
                     break
-                await ws.send(line.rstrip("\n"))
+
+                msg = line.rstrip("\n")
+                if not msg:
+                    continue
+
+                await ws.send(msg)
 
         await asyncio.gather(receiver(), sender())
-
 
 if __name__ == "__main__":
     asyncio.run(main())
