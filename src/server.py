@@ -10,6 +10,7 @@ async def handler(ws):
     global CL_ID
 
     CLIENTS_IDs[ws] = CL_ID
+    await ws.send(f"Connecting as Client {CL_ID}")
     CL_ID += 1
     CLIENTS.add(ws)
 
@@ -32,7 +33,7 @@ async def handler(ws):
         CLIENTS_IDs.pop(ws, None)
 
 async def main():
-    port = int(os.environ.get("PORT", "10000")) # ties port the the enviorment variable thats the port, 10000 is a fallback ID if no port is given.
+    port = int(os.environ.get("PORT", "8765")) # ties port the the enviorment variable thats the port, 10000 is a fallback ID if no port is given.
     host = "0.0.0.0"
 
     async with websockets.serve(handler, host, port):
