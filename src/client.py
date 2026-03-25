@@ -69,9 +69,9 @@ async def main():
                         line = await session.prompt_async(prompt_str)
                     except (EOFError, KeyboardInterrupt):
                         break
-                    if line.strip():
-                        await ws.send(line)
-                        print_formatted_text(HTML(f'<cyan>Client {my_id}</cyan>: {line}'))
+                    # if line.strip():
+                    #     await ws.send(line)
+                    #     print_formatted_text(HTML(f'<cyan>Client {my_id}</cyan>: {line}'))
  
 
         await asyncio.gather(receiver(), sender())
