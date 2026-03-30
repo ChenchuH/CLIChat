@@ -62,6 +62,7 @@ async def handler(ws):
     CL_ID += 1
     CLIENTS.add(ws)
 
+    await ws.send(f"__ID__:{CLIENTS_IDs[ws]}")  # ← send ID first
     await send_history(ws)
 
     try:
